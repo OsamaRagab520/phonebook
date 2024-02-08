@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-1">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <form method="post" class="form">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input id="name" type="text" name="name" class="form-control" required />
+          </div>
+          <div id="phone-numbers">
+            <div class="form-group phone-number">
+              <div class="row">
+                <div class="col-md-4">
+                  <label for="codes">Country Code:</label>
+                  <select id="codes" name="codes[]" class="form-control" required>
+                    {% for country_code in country_codes %}
+                      <option value="{{ country_code.code }}">{{ country_code.name }} {{ country_code.code }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-8">
+                  <label for="numbers">Number:</label>
+                  <input id="numbers"
+                         type="number"
+                         name="numbers[]"
+                         class="form-control"
+                         required />
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-1">Add Contact</button>
+          <button type="button" id="add-phone-number" class="btn btn-secondary mt-1">Add Phone Number</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('add-phone-number').addEventListener('click', function() {
+      var phoneNumbers = document.getElementById('phone-numbers');
+      var newPhoneNumber = phoneNumbers.getElementsByClassName('phone-number')[0].cloneNode(true);
+      phoneNumbers.appendChild(newPhoneNumber);
+    });
+  </script>
+{% endblock content %}

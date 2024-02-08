@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <h1 class="text-center">{{ contact.name }}</h1>
+        <ul class="list-group">
+          {% for number in contact.phone_numbers.all %}
+            <li class="list-group-item text-center fs-3">
+              {{ number.country_code.code }} {{ number.number }}
+              <a href="{% url 'contacts:delete_phone_number' number.id %}"
+                 class="btn btn-danger btn-sm">Delete</a>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="text-center mt-1">
+          <a href="{% url 'contacts:edit_contact' contact.id %}"
+             class="btn btn-primary">Edit</a>
+          <a href="{% url 'contacts:delete_contact' contact.id %}"
+             class="btn btn-danger">Delete</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

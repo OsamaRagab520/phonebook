@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        {% if contacts %}
+          <ul class="list-group">
+            {% for contact in contacts %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a class="fs-5 text-decoration-none col-3"
+                   href="{% url 'contacts:contact_detail' contact.id %}">{{ contact.name }}</a>
+                <span class="text-muted col-4">{{ contact.created_at }}</span>
+                <a class="btn btn-danger col-2"
+                   href="{% url 'contacts:delete_contact' contact.id %}">Delete</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="fs-4 text-center">There are no contacts.</p>
+          <div class="text-center">
+            <!-- Add text-center class here -->
+            <a class="btn btn-primary" href="{% url 'contacts:add_contact' %}">Add Contact</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
