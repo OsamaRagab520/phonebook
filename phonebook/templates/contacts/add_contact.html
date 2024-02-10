@@ -35,6 +35,7 @@
           <button type="submit" class="btn btn-primary mt-1">Add Contact</button>
           <button type="button" id="add-phone-number" class="btn btn-secondary mt-1">Add Phone Number</button>
         </form>
+        {% if error %}<div class="alert alert-danger mt-1">{{ error }}</div>{% endif %}
       </div>
     </div>
   </div>

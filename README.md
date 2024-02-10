@@ -7,6 +7,20 @@ simple phonebook application
 
 License: MIT
 
+## Database Schema
+
+Here is the ERD for the database:
+
+![ERD](./docs/erd.png)
+
+The database includes the following tables:
+
+- `Contact`: This table stores information about contacts in the phonebook. Each contact has a name, phone number, and email.
+
+- `CountryCode`: This table stores information about country codes. Each country code has a code and a country name.
+
+- `PhoneNumber`: This table stores phone numbers associated with contacts. Each phone number has a number, a foreign key to the Contact table representing the contact it belongs to, and a foreign key to the CountryCode table representing the country code of the phone number.
+
 ## Settings
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
@@ -44,6 +58,15 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 ### Live reloading and Sass CSS compilation
 
 Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html#sass-compilation-live-reloading).
+
+## Development
+
+To start the development server and build the project, run the following commands:
+
+
+    $ make build
+    $ make up
+
 
 ## Deployment
 

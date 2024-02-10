@@ -18,3 +18,4 @@ django-compressor==4.4  # https://github.com/django-compressor/django-compressor
 django-redis==5.4.0  # https://github.com/jazzband/django-redis
 phonenumbers==8.13.29  # https://github.com/daviddrysdale/python-phonenumbers
 pycountry==23.12.11  # https://github.com/pycountry/pycountry
+djangorestframework==3.14.0  # https://github.com/encode/django-rest-framework

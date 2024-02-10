@@ -15,6 +15,10 @@
                    value="{{ contact.name }}"
                    required />
           </div>
+          <input id="contact_id"
+                 type="hidden"
+                 name="contact_id"
+                 value="{{ contact.id }}" />
           {% for phone_number in contact.phone_numbers.all %}
             <div id="phone-numbers">
               <div class="form-group phone-number">
@@ -47,6 +51,7 @@
           <button type="submit" class="btn btn-success mt-1">Save</button>
           <button type="button" id="add-phone-number" class="btn btn-secondary mt-1">Add Phone Number</button>
         </form>
+        {% if error %}<div class="alert alert-danger mt-1">{{ error }}</div>{% endif %}
       </div>
     </div>
   </div>

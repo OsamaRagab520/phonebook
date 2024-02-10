@@ -1,14 +1,8 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 
-from phonebook.contacts.models import Contact, CountryCode
-from phonebook.contacts.services import (
-    create_contact,
-    delete_phone_number,
-    get_contact,
-    list_contacts,
-    list_country_codes,
-    update_contact,
-)
+from phonebook.contacts.selectors import list_contacts, list_country_codes
+from phonebook.contacts.services import create_contact, delete_phone_number, get_contact, update_contact
 
 
 def add_contact(request):
@@ -16,7 +10,12 @@ def add_contact(request):
         name = request.POST["name"]
         numbers = request.POST.getlist("numbers[]")
         codes = request.POST.getlist("codes[]")
-        create_contact(name=name, numbers=numbers, codes=codes)
+
+        try:
+            create_contact(name=name, numbers=numbers, codes=codes)
+        except ValueError as e:
+            return render(request, "contacts/add_contact.html", {"error": str(e)})
+
         return redirect("contacts:contact_list")
     else:
         country_codes = list_country_codes()
@@ -29,7 +28,10 @@ def contact_list(request):
 
 
 def contact_detail(request, pk):
-    contact = get_contact(pk=pk)
+    try:
+        contact = get_contact(pk=pk)
+    except Http404:
+        return render(request, "404.html", status=404)
     return render(request, "contacts/contact_detail.html", {"contact": contact})
 
 
@@ -40,15 +42,16 @@ def delete_contact(request, pk):
 
 
 def edit_contact(request, pk):
-    contact = get_object_or_404(Contact, pk=pk)
+    contact = get_contact(pk=pk)
     if request.method == "POST":
+        id = request.POST["contact_id"]
         name = request.POST["name"]
         numbers = request.POST.getlist("numbers[]")
         codes = request.POST.getlist("codes[]")
-        update_contact(name=name, numbers=numbers, codes=codes)
+        update_contact(id=id, name=name, numbers=numbers, codes=codes)
         return redirect("contacts:contact_list")
     else:
-        country_codes = CountryCode.objects.all()
+        country_codes = list_country_codes
         return render(request, "contacts/edit_contact.html", {"contact": contact, "country_codes": country_codes})
 
 
