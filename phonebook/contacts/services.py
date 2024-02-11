@@ -2,19 +2,12 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from phonebook.contacts.models import Contact, CountryCode, PhoneNumber
-from phonebook.contacts.selectors import get_contact
+from phonebook.contacts.selectors import get_contact, get_country_code
 
 
-def create_phone_number(*, contact: Contact, country_code: str, number: str):
+def create_phone_number(*, contact: Contact, country_code: CountryCode, number: str):
     if not number.isdigit():
         raise ValueError("Number must be numeric")
-
-    try:
-        country_code = CountryCode.objects.get(code=country_code)
-    except CountryCode.DoesNotExist:
-        raise ValueError("Country code does not exist")
-    except CountryCode.MultipleObjectsReturned:
-        country_code = CountryCode.objects.filter(code=country_code).first()
 
     return PhoneNumber.objects.create(contact=contact, country_code=country_code, number=number)
 
@@ -31,6 +24,9 @@ def delete_phone_number(*, pk: int) -> Contact:
 
 @transaction.atomic
 def create_contact(*, name: str, numbers: list[str], codes: list[str]):
+    if len(numbers) != len(codes):
+        raise ValueError("Number and country code lists must be the same length")
+
     if Contact.objects.filter(name=name).exists():
         raise ValueError("Contact with this name already exists")
 
@@ -39,7 +35,8 @@ def create_contact(*, name: str, numbers: list[str], codes: list[str]):
     contact.save()
 
     for number, code in zip(numbers, codes):
-        create_phone_number(contact=contact, country_code=code, number=number)
+        country_code = get_country_code(code=code)
+        create_phone_number(contact=contact, country_code=country_code, number=number)
     return contact
 
 
@@ -57,6 +54,7 @@ def update_contact(*, id: int, name: str, numbers: list[str], codes: list[str]):
     contact.save()
 
     for number, code in zip(numbers, codes):
-        create_phone_number(contact=contact, country_code=code, number=number)
+        country_code = get_country_code(code=code)
+        create_phone_number(contact=contact, country_code=country_code, number=number)
 
     return contact

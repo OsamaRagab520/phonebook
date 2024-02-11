@@ -8,6 +8,11 @@ def list_country_codes() -> QuerySet[CountryCode]:
     return CountryCode.objects.all()
 
 
+def get_country_code(*, code: str) -> CountryCode | None:
+    country_code = CountryCode.objects.filter(code=code).first()
+    return country_code
+
+
 def list_contacts() -> QuerySet[Contact]:
     return Contact.objects.all()
 

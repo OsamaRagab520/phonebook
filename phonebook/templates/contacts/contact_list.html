@@ -16,10 +16,10 @@
               </li>
             {% endfor %}
           </ul>
+          {% include "pagination.html" with page=page_obj %}
         {% else %}
           <p class="fs-4 text-center">There are no contacts.</p>
           <div class="text-center">
-            <!-- Add text-center class here -->
             <a class="btn btn-primary" href="{% url 'contacts:add_contact' %}">Add Contact</a>
           </div>
         {% endif %}

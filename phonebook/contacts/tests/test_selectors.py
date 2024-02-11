@@ -9,11 +9,12 @@ def test_list_contacts(db):
     assert len(contacts) == 5
 
 
-def test_get_contact(db, contact: Contact):
-    fetched_contact = get_contact(contact.id)
+def test_get_contact(db, contact_with_phone_number: Contact):
+    contact = contact_with_phone_number
+    fetched_contact = get_contact(pk=contact.id)
     assert fetched_contact.id == contact.id
     assert fetched_contact.name == contact.name
-    assert fetched_contact.phone_number == contact.phone_number
+    assert fetched_contact.phone_numbers == contact.phone_numbers
 
 
 def test_get_contacts_by_name(db):

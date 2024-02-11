@@ -1,4 +1,4 @@
-from factory import LazyAttribute, SubFactory
+from factory import LazyAttribute, SubFactory, post_generation
 from factory.django import DjangoModelFactory
 
 from phonebook.contacts.models import Contact, PhoneNumber
@@ -14,10 +14,19 @@ class ContactFactory(DjangoModelFactory):
         model = Contact
 
 
+class ContactWithPhoneNumberFactory(ContactFactory):
+    @post_generation
+    def phonenumbers(obj, create, extracted, **kwargs):
+        if create:
+            phonenumbers = extracted or PhoneNumberFactory(contact=obj)
+
+            return phonenumbers
+
+
 class PhoneNumberFactory(DjangoModelFactory):
     contact = SubFactory(ContactFactory)
     country_code = LazyAttribute(lambda _: get_random_country_code())
-    number = LazyAttribute(lambda _: faker.phone_number())
+    number = LazyAttribute(lambda _: faker.basic_phone_number())
 
     class Meta:
         model = PhoneNumber
