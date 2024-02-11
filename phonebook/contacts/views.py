@@ -45,6 +45,9 @@ class ContactDetailView(View):
 class DeleteContactView(View):
     def get(self, request, pk):
         contact = get_contact(pk=pk)
+        if contact is None:
+            return render(request, "404.html", status=404)
+
         contact.delete()
         return redirect("contacts:contact_list")
 

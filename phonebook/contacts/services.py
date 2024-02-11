@@ -5,11 +5,15 @@ from phonebook.contacts.models import Contact, CountryCode, PhoneNumber
 from phonebook.contacts.selectors import get_contact, get_country_code
 
 
-def create_phone_number(*, contact: Contact, country_code: CountryCode, number: str):
+def create_phone_number(*, contact: Contact, country_code: CountryCode, number: str) -> PhoneNumber:
     if not number.isdigit():
         raise ValueError("Number must be numeric")
 
-    return PhoneNumber.objects.create(contact=contact, country_code=country_code, number=number)
+    phone_number = PhoneNumber(contact=contact, country_code=country_code, number=number)
+    phone_number.full_clean()
+    phone_number.save()
+
+    return phone_number
 
 
 def delete_phone_number(*, pk: int) -> Contact:
@@ -36,17 +40,22 @@ def create_contact(*, name: str, numbers: list[str], codes: list[str]):
 
     for number, code in zip(numbers, codes):
         country_code = get_country_code(code=code)
+        if country_code is None:
+            raise ValueError("Invalid country code")
         create_phone_number(contact=contact, country_code=country_code, number=number)
     return contact
 
 
 @transaction.atomic
-def update_contact(*, id: int, name: str, numbers: list[str], codes: list[str]):
+def update_contact(*, id: int, name: str, numbers: list[str], codes: list[str]) -> Contact:
 
     if Contact.objects.exclude(pk=id).filter(name=name).exists():
         raise ValueError("Contact with this name already exists")
 
     contact = get_contact(pk=id)
+    if contact is None:
+        raise ValueError("Contact not found")
+
     contact.name = name
     contact.phone_numbers.all().delete()
 
@@ -55,6 +64,8 @@ def update_contact(*, id: int, name: str, numbers: list[str], codes: list[str]):
 
     for number, code in zip(numbers, codes):
         country_code = get_country_code(code=code)
+        if country_code is None:
+            raise ValueError("Invalid country code")
         create_phone_number(contact=contact, country_code=country_code, number=number)
 
     return contact

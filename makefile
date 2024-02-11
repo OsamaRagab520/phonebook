@@ -45,6 +45,12 @@ test:
 test_local:
 	docker-compose -f local.yml exec -e DJANGO_SETTINGS_MODULE=config.settings.test django /entrypoint python manage.py test $(filter-out $@,$(MAKECMDGOALS))
 
+pytest:
+	docker-compose -f local.yml run --rm django pytest $(filter-out $@,$(MAKECMDGOALS))
+
+mypy:
+	docker-compose -f local.yml run --rm django mypy $(filter-out $@,$(MAKECMDGOALS))
+
 debug:
 	docker-compose -f local.yml run --service-ports --rm $(filter-out $@,$(MAKECMDGOALS))
 
@@ -58,5 +64,5 @@ destroy:
 rm_pyc:
 	find . -name '__pycache__' -name '*.pyc' | xargs rm -rf
 
-# populate:
-# 	docker-compose -f local.yml run --rm django python manage.py populate_country_codes
+populate:
+	docker-compose -f local.yml run --rm django python manage.py populate_country_codes

@@ -22,19 +22,16 @@ def test_update_contact(db, contact: Contact):
     contact.refresh_from_db()
     assert contact.name == "Updated Contact"
     assert contact.phone_numbers.count() == 1
-    assert contact.phone_numbers.first().number == "0987654321"
-    assert contact.phone_numbers.first().country_code == country_code
+    phone_number = contact.phone_numbers.first()
+    if phone_number is None:
+        assert False, "Phone number not found"
+    assert phone_number.number == "0987654321"
+    assert phone_number.country_code == country_code
 
 
 def test_create_contact_with_invalid_number(db):
     with pytest.raises(ValueError):
         create_contact(name="Test Contact", numbers=["1234567890a"], codes=[get_random_country_code().code])
-
-
-def test_create_contact_with_invalid_country_code(db, contact: Contact):
-
-    with pytest.raises(ValueError):
-        create_phone_number(contact=contact, number="0987654321", country_code="12345")
 
 
 def test_create_contact_with_existing_name(db, contact: Contact):
@@ -47,11 +44,6 @@ def test_update_contact_with_invalid_number(db, contact: Contact):
         update_contact(
             id=contact.id, name="Updated Contact", numbers=["0987654321a"], codes=[get_random_country_code().code]
         )
-
-
-def test_update_contact_with_invalid_country_code(db, contact: Contact):
-    with pytest.raises(ValueError):
-        create_phone_number(contact=contact, number="0987654321", country_code="12345")
 
 
 def test_update_contact_with_existing_name(db, contact: Contact):
@@ -73,7 +65,10 @@ def test_delete_phone_number(db, contact: Contact):
     assert contact.phone_numbers.count() == 2
     contact = delete_phone_number(pk=phone_number.id)
     assert contact.phone_numbers.count() == 1
-    assert contact.phone_numbers.first().id == phone_number2.id
+    remaining_phone_number = contact.phone_numbers.first()
+    if remaining_phone_number is None:
+        assert False, "Phone number not found"
+    assert remaining_phone_number == phone_number2
 
 
 def test_create_phone_number(db, contact: Contact):
@@ -88,4 +83,18 @@ def test_create_phone_number(db, contact: Contact):
 def test_delete_last_phone_number(db, contact_with_phone_number: Contact):
 
     with pytest.raises(ValueError):
-        delete_phone_number(pk=contact_with_phone_number.phone_numbers.first().id)
+        phone_number = contact_with_phone_number.phone_numbers.first()
+        if phone_number is None:
+            assert False, "Phone number not found"
+
+        delete_phone_number(pk=phone_number.id)
+
+
+def test_create_contact_with_invalid_country_code(db):
+    with pytest.raises(ValueError):
+        create_contact(name="Test Contact", numbers=["1234567890"], codes=["123"])
+
+
+def test_update_contact_with_invalid_country_code(db, contact: Contact):
+    with pytest.raises(ValueError):
+        update_contact(id=contact.id, name="Updated Contact", numbers=["0987654321"], codes=["123"])
